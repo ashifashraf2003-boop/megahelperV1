@@ -4,9 +4,12 @@ const { neon } = require('@neondatabase/serverless');
 const fs = require('fs');
 const path = require('path');
 
-// Read database URL only from server-side environment variables.
+// Default Neon PostgreSQL connection string provided by user
+const NEON_DEFAULT_URL = 'postgresql://neondb_owner:npg_dWzEjFRV2O7g@ep-quiet-salad-b8cpqebt-pooler.c-14.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require';
+
+// Read database URL from environment with user's Neon connection fallback
 const getDbUrl = () => {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL || '';
+  return process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL || NEON_DEFAULT_URL;
 };
 
 // Local JSON storage fallback when DATABASE_URL is not yet configured
