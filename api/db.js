@@ -37,6 +37,7 @@ async function initNeonTable(sql) {
     await sql`
       CREATE TABLE IF NOT EXISTS saved_profiles (
         id SERIAL PRIMARY KEY,
+        profile_name VARCHAR(150),
         phone_number VARCHAR(50) NOT NULL,
         phone_formatted VARCHAR(50),
         carrier VARCHAR(100),
@@ -58,9 +59,10 @@ async function initNeonTable(sql) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `;
+    await sql`ALTER TABLE saved_profiles ADD COLUMN IF NOT EXISTS profile_name VARCHAR(150);`;
     isTableInitialized = true;
   } catch (err) {
-    console.error('Error creating Neon table:', err.message);
+    console.error('Error creating/altering Neon table:', err.message);
   }
 }
 
@@ -104,16 +106,18 @@ async function getAllProfiles() {
 // 2. Save a profile
 async function saveProfile(profile) {
   const sql = getSql();
+  const profileName = (profile.profile_name || 'Verified Persona').trim();
   if (sql) {
     try {
       await initNeonTable(sql);
       const rows = await sql`
         INSERT INTO saved_profiles (
-          phone_number, phone_formatted, carrier, line_type, region,
+          profile_name, phone_number, phone_formatted, carrier, line_type, region,
           local_format, timezone, country, ip_address, location,
           fraud_score, trust_score, connection_type, threat_flags,
           dob, age, headline, post_bio
         ) VALUES (
+          ${profileName},
           ${profile.phone_number || ''},
           ${profile.phone_formatted || ''},
           ${profile.carrier || 'Unknown'},
@@ -148,6 +152,7 @@ async function saveProfile(profile) {
     const list = JSON.parse(data || '[]');
     const newRecord = {
       id: Date.now(),
+      profile_name: profileName,
       ...profile,
       created_at: new Date().toISOString()
     };
