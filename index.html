@@ -43,14 +43,28 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
 
-  <div id="accessGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 px-4">
-    <form id="accessForm" class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" novalidate>
-      <h2 class="text-lg font-black text-slate-900">Private access</h2>
-      <p class="mt-1 text-xs leading-5 text-slate-500">This app is limited to the approved IP address and device session.</p>
-      <label for="accessPassword" class="mt-5 block text-xs font-bold text-slate-700">Access password</label>
-      <input id="accessPassword" type="password" autocomplete="current-password" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-600 focus:bg-white" />
+  <div id="accessGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-xs px-4">
+    <form id="accessForm" class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-slate-100" novalidate>
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-lg font-black text-slate-900">Private Access Login</h2>
+      </div>
+      <p class="text-xs leading-5 text-slate-500">Unrecognized network detected. Sign in with your username and password for 8 hours of verified access.</p>
+      
+      <div class="mt-4 space-y-3">
+        <div>
+          <label for="accessUsername" class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+          <input id="accessUsername" type="text" autocomplete="username" placeholder="Username (default: admin)" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-brand-600 focus:bg-white transition-colors" />
+        </div>
+        <div>
+          <label for="accessPassword" class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input id="accessPassword" type="password" autocomplete="current-password" placeholder="Password" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-brand-600 focus:bg-white transition-colors" />
+        </div>
+      </div>
+
+      <p class="mt-2 text-[11px] text-slate-400">Approved IP addresses are authenticated automatically without login.</p>
       <p id="accessError" class="mt-2 min-h-4 text-xs font-semibold text-rose-600" aria-live="polite"></p>
-      <button id="accessSubmit" type="submit" class="mt-4 w-full rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-extrabold text-white transition-colors hover:bg-brand-700">Continue</button>
+      
+      <button id="accessSubmit" type="submit" class="mt-4 w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-extrabold text-xs shadow-md shadow-brand-600/20 transition-all cursor-pointer">Login</button>
     </form>
   </div>
 
@@ -736,52 +750,73 @@
     async function initAccessGate() {
       const gate = document.getElementById('accessGate');
       const form = document.getElementById('accessForm');
-      const password = document.getElementById('accessPassword');
+      const userInput = document.getElementById('accessUsername');
+      const passInput = document.getElementById('accessPassword');
       const error = document.getElementById('accessError');
       const submit = document.getElementById('accessSubmit');
 
+      if (!gate || !form) return true;
+
       const showGate = (message = '') => {
         gate.classList.remove('hidden');
-        error.textContent = message;
-        password.focus();
+        if (error) error.textContent = message;
+        if (userInput) userInput.focus();
       };
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        error.textContent = '';
-        submit.disabled = true;
-        submit.textContent = 'Checking';
+        if (error) error.textContent = '';
+        if (submit) {
+          submit.disabled = true;
+          submit.textContent = 'Verifying...';
+        }
+
         try {
           const response = await fetch('/api/auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
-            body: JSON.stringify({ password: password.value })
+            body: JSON.stringify({
+              username: userInput ? userInput.value.trim() : '',
+              password: passInput ? passInput.value : ''
+            })
           });
-          if (!response.ok) throw new Error('Access denied.');
-          gate.classList.add('hidden');
-          password.value = '';
-          loadSavedProfiles();
+
+          const result = await response.json().catch(() => ({}));
+          if (response.ok && result.success) {
+            gate.classList.add('hidden');
+            if (passInput) passInput.value = '';
+            if (userInput) userInput.value = '';
+            loadSavedProfiles();
+            showToast('Login successful. Session active for 8 hours.');
+          } else {
+            if (error) error.textContent = result.message || 'Invalid username or password.';
+            if (passInput) {
+              passInput.value = '';
+              passInput.focus();
+            }
+          }
         } catch (_) {
-          password.value = '';
-          error.textContent = 'Access denied.';
-          password.focus();
+          if (error) error.textContent = 'Network or server error during login.';
         } finally {
-          submit.disabled = false;
-          submit.textContent = 'Continue';
+          if (submit) {
+            submit.disabled = false;
+            submit.textContent = 'Login';
+          }
         }
       });
 
       try {
         const response = await fetch('/api/auth', { credentials: 'same-origin' });
-        const result = await response.json();
+        const result = await response.json().catch(() => ({}));
         if (response.ok && result.authenticated) {
+          // IP matched or already have valid 8-hour session -> Auto-unlock!
           gate.classList.add('hidden');
           return true;
         }
-        showGate(response.status === 403 ? 'This IP is not allowed.' : '');
+        showGate('');
       } catch (_) {
-        showGate('Access check failed.');
+        showGate('Access verification failed.');
       }
       return false;
     }

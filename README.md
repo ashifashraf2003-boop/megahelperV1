@@ -33,15 +33,16 @@ A powerful Web Application that integrates **Scamalytics Free IP Reputation**, *
    DATABASE_URL=postgresql://neondb_owner:YOUR_PASSWORD@ep-YOUR-PROJECT.us-east-2.aws.neon.tech/neondb?sslmode=require
    ```
 
-   Private access also requires these server-side values:
+   Private access configuration:
    ```bash
    ACCESS_ALLOWED_IPS=YOUR_CURRENT_PUBLIC_IP,127.0.0.1,::1
+   ACCESS_USERNAME=admin
    ACCESS_PASSWORD=use-a-long-random-password
    ACCESS_SESSION_SECRET=use-a-random-32-plus-character-secret
    VERIPHONE_KEY=your_veriphone_api_key
    AI_STUDIO_KEY=your_gemini_api_key
    ```
-   The app denies every IP not listed in `ACCESS_ALLOWED_IPS`. A successful password login creates an HttpOnly browser session for eight hours.
+   Devices connecting from `ACCESS_ALLOWED_IPS` are authenticated automatically without requiring username/password. Any other network requires signing in with username and password, which activates an 8-hour authenticated browser session.
 
 3. **Start the local server**:
    ```bash
@@ -60,7 +61,8 @@ A powerful Web Application that integrates **Scamalytics Free IP Reputation**, *
    - `DATABASE_URL`: Your Neon PostgreSQL Connection String (from [Neon Console](https://console.neon.tech)).
    - `VERIPHONE_KEY`: Your Veriphone API Key.
    - `AI_STUDIO_KEY`: Your Gemini AI Studio Key.
-   - `ACCESS_ALLOWED_IPS`: Your current public IP address.
+   - `ACCESS_ALLOWED_IPS`: Your current public IP address (for instant auto-login without user/pass).
+   - `ACCESS_USERNAME`: Your chosen admin username (e.g. admin).
    - `ACCESS_PASSWORD`: A long unique password for this app.
    - `ACCESS_SESSION_SECRET`: A random secret at least 32 characters long.
 5. Click **"Deploy"**! Your live web application with full Neon database persistence will be running in seconds.

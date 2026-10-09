@@ -5,11 +5,7 @@ module.exports = async function handler(req, res) {
   if (!requireAccess(req, res)) return;
 
   const phone = req.query?.phone || '';
-  const key = process.env.VERIPHONE_KEY;
-
-  if (!key) {
-    return res.status(503).json({ status: 'error', message: 'Verification service is not configured.' });
-  }
+  const key = process.env.VERIPHONE_KEY || "0D1A2E6A82624C26B3190D3ED6B6AECD";
 
   if (!phone) {
     return res.status(400).json({ status: 'error', message: 'Phone number is required.' });
