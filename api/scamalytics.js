@@ -1,12 +1,7 @@
 // Scamalytics Free IP Reputation & Geolocation Endpoint
+const { requireAccess } = require('./access');
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (!requireAccess(req, res)) return;
 
   const ip = req.query?.ip || '104.28.194.5';
 

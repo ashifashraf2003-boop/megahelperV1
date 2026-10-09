@@ -11,6 +11,7 @@ const scamalyticsHandler = require('./api/scamalytics');
 const verifyHandler = require('./api/verify');
 const geminiHandler = require('./api/gemini');
 const profilesHandler = require('./api/profiles');
+const authHandler = require('./api/auth');
 
 // Helper to mock Vercel req/res for standard Node http
 function adaptHandler(handler) {
@@ -51,6 +52,9 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
 
   // 1. API Endpoints
+  if (pathname === '/api/auth') {
+    return adaptHandler(authHandler)(req, res);
+  }
   if (pathname === '/api/scamalytics') {
     return adaptHandler(scamalyticsHandler)(req, res);
   }

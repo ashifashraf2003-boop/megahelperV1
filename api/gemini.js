@@ -1,6 +1,6 @@
 // Gemini AI Persona Generation Endpoint
 try { require('dotenv').config(); } catch (e) {}
-const DEFAULT_KEY = process.env.GEMINI_API_KEY || process.env.AI_STUDIO_KEY || "AIzaSyCLOg1HH8DpFuh2B4KkUGRCGab_oXq6z3E";
+const { requireAccess } = require('./access');
 
 const EXPANDED_TEMPLATES = [
   { headline: "Coffee first, adventure after?", post: "Always down for a spontaneous road trip or hunting down the best local bakery in town. Looking for someone witty, kind, and ready for some genuine laughs. Let's make a plan!" },
@@ -26,16 +26,9 @@ const EXPANDED_TEMPLATES = [
 ];
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (!requireAccess(req, res)) return;
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  const key = req.body?.key || req.query?.key || process.env.GEMINI_API_KEY || process.env.AI_STUDIO_KEY || DEFAULT_KEY;
+  const key = process.env.GEMINI_API_KEY || process.env.AI_STUDIO_KEY;
 
   const prompt = `You are an expert copywriter creating authentic, captivating social and dating profile personas.
 Generate ONE completely unique, realistic Headline and Post/Bio inspired by casual, charming, and magnetic dating copy.

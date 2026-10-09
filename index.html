@@ -43,6 +43,17 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
 
+  <div id="accessGate" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 px-4">
+    <form id="accessForm" class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" novalidate>
+      <h2 class="text-lg font-black text-slate-900">Private access</h2>
+      <p class="mt-1 text-xs leading-5 text-slate-500">This app is limited to the approved IP address and device session.</p>
+      <label for="accessPassword" class="mt-5 block text-xs font-bold text-slate-700">Access password</label>
+      <input id="accessPassword" type="password" autocomplete="current-password" required class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-600 focus:bg-white" />
+      <p id="accessError" class="mt-2 min-h-4 text-xs font-semibold text-rose-600" aria-live="polite"></p>
+      <button id="accessSubmit" type="submit" class="mt-4 w-full rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-extrabold text-white transition-colors hover:bg-brand-700">Continue</button>
+    </form>
+  </div>
+
   <!-- ================= TOP HEADER BAR ================= -->
   <header class="bg-white border-b border-slate-200/90 sticky top-0 z-30 shadow-2xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -208,18 +219,17 @@
 
           <!-- HERO WINNER CARD -->
           <div class="bg-gradient-to-r from-brand-50/90 via-amber-50/30 to-white rounded-2xl p-4 sm:p-5 border border-brand-200/90 mb-4 shadow-2xs">
-            <div class="flex items-center justify-between gap-2 mb-1.5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-3">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 <span id="lblWinnerTitle" class="text-xs font-black uppercase tracking-wide text-emerald-700">Real Mobile SIM Verified</span>
               </div>
-              <!-- Copy Number Button (WITHOUT +1) -->
               <button 
                 onclick="copyWinnerNumberOnly()" 
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
-                title="Copies 10-digit number without +1"
+                class="inline-flex w-full sm:w-auto items-center justify-center px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-extrabold shadow-sm shadow-brand-600/20 transition-all cursor-pointer"
+                title="Copy number"
               >
-                Copy Number <span class="text-[10px] opacity-90 font-normal">(no +1)</span>
+                Copy number
               </button>
             </div>
 
@@ -542,8 +552,7 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-12 opacity-0 pointer-events-none flex items-center gap-2">
-    <span id="toastIcon">✅</span>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-12 opacity-0 pointer-events-none">
     <span id="toastMsg">Saved!</span>
   </div>
 
@@ -718,11 +727,64 @@
     };
 
     // 1. Initialization
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       initYearDropdown();
       onDobChanged();
-      loadSavedProfiles();
+      if (await initAccessGate()) loadSavedProfiles();
     });
+
+    async function initAccessGate() {
+      const gate = document.getElementById('accessGate');
+      const form = document.getElementById('accessForm');
+      const password = document.getElementById('accessPassword');
+      const error = document.getElementById('accessError');
+      const submit = document.getElementById('accessSubmit');
+
+      const showGate = (message = '') => {
+        gate.classList.remove('hidden');
+        error.textContent = message;
+        password.focus();
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        error.textContent = '';
+        submit.disabled = true;
+        submit.textContent = 'Checking';
+        try {
+          const response = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ password: password.value })
+          });
+          if (!response.ok) throw new Error('Access denied.');
+          gate.classList.add('hidden');
+          password.value = '';
+          loadSavedProfiles();
+        } catch (_) {
+          password.value = '';
+          error.textContent = 'Access denied.';
+          password.focus();
+        } finally {
+          submit.disabled = false;
+          submit.textContent = 'Continue';
+        }
+      });
+
+      try {
+        const response = await fetch('/api/auth', { credentials: 'same-origin' });
+        const result = await response.json();
+        if (response.ok && result.authenticated) {
+          gate.classList.add('hidden');
+          return true;
+        }
+        showGate(response.status === 403 ? 'This IP is not allowed.' : '');
+      } catch (_) {
+        showGate('Access check failed.');
+      }
+      return false;
+    }
 
     function initYearDropdown() {
       const sel = document.getElementById('selectYear');
@@ -762,7 +824,7 @@
     function startAutomation() {
       const raw = document.getElementById('inputProxy').value.trim();
       if (!raw) {
-        showToast('Please insert a proxy or IP address!', '⚠️');
+        showToast('Enter a proxy or IP address.');
         return;
       }
 
@@ -937,8 +999,8 @@
 
       document.getElementById('lblWinnerNumber').textContent = phone;
       document.getElementById('lblWinnerCarrier').innerHTML = `Carrier: <span class="text-slate-800 font-bold">${carrier}</span>`;
-      document.getElementById('lblWinnerTitle').textContent = `✅ Real Mobile SIM Verified (Found in ${attempts} attempts)`;
-      document.getElementById('lblLoopStatus').textContent = `🎉 Found Real Mobile SIM in ${attempts} attempts! Auto-stopped.`;
+      document.getElementById('lblWinnerTitle').textContent = `Mobile SIM verified in ${attempts} attempts`;
+      document.getElementById('lblLoopStatus').textContent = 'Mobile SIM found. Search stopped.';
       
       document.getElementById('metricCarrier').textContent = carrier;
       document.getElementById('metricType').textContent = "MOBILE SIM";
@@ -947,7 +1009,7 @@
       document.getElementById('metricTimezone').textContent = currentProxyDetails.timezone;
       document.getElementById('metricCountry').textContent = "United States 🇺🇸";
 
-      showToast(`Found Real Mobile SIM: ${cleanNum}!`, '🎉');
+      showToast(`Mobile SIM found: ${cleanNum}`);
       actionAiGenerate(true);
     }
 
@@ -971,7 +1033,7 @@
           const res = await resp.json();
           if (res.headline) document.getElementById('inputHeadline').value = res.headline;
           if (res.post) document.getElementById('txtPostBio').value = res.post;
-          if (!silent) showToast('AI Persona Generated! ✨', '✨');
+          if (!silent) showToast('Persona generated.');
         }
       } catch (e) {
         actionRandomPreset();
@@ -985,13 +1047,13 @@
       const item = PRESET_BIOS[Math.floor(Math.random() * PRESET_BIOS.length)];
       document.getElementById('inputHeadline').value = item.headline;
       document.getElementById('txtPostBio').value = item.post;
-      showToast('Loaded preset persona!', '🎲');
+      showToast('Preset loaded.');
     }
 
     // ================= UNIVERSAL CLIPBOARD HELPER =================
     async function copyToClipboard(text, successMsg = 'Copied to clipboard!', icon = '📋', silent = false) {
       if (!text && text !== 0 && text !== '0') {
-        if (!silent) showToast('Nothing to copy!', '⚠️');
+        if (!silent) showToast('Nothing to copy.');
         return false;
       }
       const str = String(text);
@@ -1053,16 +1115,16 @@
         // Last resort fallback: show prompt for user to copy directly
         try {
           window.prompt('Copy to clipboard (Ctrl+C or Cmd+C):', str);
-          if (!silent) showToast('Text selected! Press Ctrl+C', '📋');
+          if (!silent) showToast('Text selected. Press Ctrl+C.');
           return true;
         } catch (e) {
-          if (!silent) showToast('Copy failed. Please copy manually.', '⚠️');
+          if (!silent) showToast('Copy failed. Copy manually.');
           return false;
         }
       }
     }
 
-    // 5. Copy Functions (Clean Without +1)
+    // 5. Copy Functions
     function copyWinnerNumberOnly() {
       let num = currentWinner?.cleanPhone;
       if (!num) {
@@ -1071,7 +1133,7 @@
         num = (digits.length === 11 && digits.startsWith('1')) ? digits.substring(1) : digits;
       }
       if (!num) num = "2142513525";
-      copyToClipboard(num, `Copied ${num} (without +1)!`, '📋');
+      copyToClipboard(num, 'Number copied.');
     }
 
     // Smart Dual Copy: Copies both Headline & Bio together, and adds them separately to clipboard history
@@ -1080,7 +1142,7 @@
       const bio = (document.getElementById('txtPostBio')?.value || '').trim();
 
       if (!headline && !bio) {
-        showToast('Nothing to copy!', '⚠️');
+        showToast('Nothing to copy.');
         return;
       }
 
@@ -1120,7 +1182,7 @@
     function copyPostBio() {
       const text = (document.getElementById('txtPostBio')?.value || '').trim();
       if (!text) {
-        showToast('Post / Bio is empty!', '⚠️');
+        showToast('Post or bio is empty.');
         return;
       }
       copyToClipboard(text, 'Copied Post / Bio!', '📋');
@@ -1302,7 +1364,7 @@ ${bio}
 
         const res = await resp.json().catch(() => ({}));
         if (resp.ok && res.success) {
-          showToast(`Saved "${nameToSave}" to Database! 💾`, '💾');
+          showToast(`Saved: ${nameToSave}`);
           if (btn) {
             btn.innerHTML = 'Saved!';
             btn.classList.add('bg-emerald-700');
@@ -1317,11 +1379,11 @@ ${bio}
           }, 2000);
           return;
         } else {
-          showToast(`Save failed: ${res.message || 'Server error'}`, '⚠️');
+          showToast(`Save failed: ${res.message || 'Server error'}`);
         }
       } catch (e) {
         console.error('Error saving profile:', e);
-        showToast(`Save error: ${e.message}`, '⚠️');
+          showToast(`Save error: ${e.message}`);
       } finally {
         if (btn && btn.disabled) {
           btn.innerHTML = originalHtml;
@@ -1446,13 +1508,13 @@ ${bio}
 
     function executeDownloadJson() {
       if (!savedProfiles || savedProfiles.length === 0) {
-        showToast('No saved profiles in database to download!', '⚠️');
+        showToast('No saved profiles.');
         return;
       }
 
       const { filterDate, profiles } = getFilteredProfilesForExport();
       if (!profiles || profiles.length === 0) {
-        showToast(`No profiles found for ${filterDate || 'selected filter'}!`, '⚠️');
+        showToast('No profiles found.');
         return;
       }
 
@@ -1499,7 +1561,7 @@ ${bio}
       document.body.removeChild(downloadAnchor);
       URL.revokeObjectURL(url);
 
-      showToast(`Downloaded ${profiles.length} profiles as ${filename}!`, '📥');
+      showToast(`Downloaded ${profiles.length} profiles.`);
       toggleJsonExportModal(false);
     }
 
@@ -1513,10 +1575,9 @@ ${bio}
 
     // 9. Toast Notification Helper
     let toastTimer = null;
-    function showToast(msg, icon = '✅') {
+    function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = msg;
-      document.getElementById('toastIcon').textContent = icon;
       toast.classList.remove('translate-y-12', 'opacity-0');
 
       if (toastTimer) clearTimeout(toastTimer);
