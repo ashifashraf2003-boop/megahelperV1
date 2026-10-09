@@ -5,7 +5,7 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8; // 8 hours (28,800 seconds)
 const DEFAULT_SESSION_SECRET = 'wh-GHmkBEE12heOpVyMOE0QaLDXQOH2B6ZE8kPUJ_sqc_7pzHVYF0PMqVStzdGH9';
 
 function allowedIps() {
-  return (process.env.ACCESS_ALLOWED_IPS || '103.156.189.79,127.0.0.1,::1')
+  return (process.env.ACCESS_ALLOWED_IPS || '103.156.189.77,103.156.189.79,103.156.189.*,127.0.0.1,::1')
     .split(',')
     .map((ip) => ip.trim())
     .filter(Boolean);
@@ -21,7 +21,22 @@ function ipIsAllowed(req) {
   const ips = allowedIps();
   if (ips.length === 0) return false;
   const current = clientIp(req);
-  return ips.includes(current);
+  if (!current) return false;
+
+  return ips.some(entry => {
+    if (entry === current) return true;
+    // Support wildcard matching e.g. 103.156.189.*
+    if (entry.endsWith('.*')) {
+      const prefix = entry.slice(0, -1);
+      if (current.startsWith(prefix)) return true;
+    }
+    // Support CIDR /24 matching e.g. 103.156.189.0/24
+    if (entry.endsWith('/24')) {
+      const subnet = entry.split('/')[0].split('.').slice(0, 3).join('.');
+      if (current.startsWith(subnet + '.')) return true;
+    }
+    return false;
+  });
 }
 
 function parseCookies(req) {
