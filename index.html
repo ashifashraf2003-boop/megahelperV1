@@ -63,16 +63,15 @@
         </div>
       </div>
 
-      <!-- Header Actions: Single Clean Slider Control Hub -->
+      <!-- Header Action: Download JSON -->
       <div class="flex items-center gap-2 sm:gap-3">
         <button 
-          id="btnOpenSliderHub" 
-          onclick="toggleSavedDrawer(true)" 
+          id="btnOpenJsonModal" 
+          onclick="toggleJsonExportModal(true)" 
           class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-md shadow-slate-900/15 cursor-pointer" 
-          title="Open Control Hub, Database & Settings Slider"
+          title="Download Saved Profiles as JSON"
         >
-          <span class="text-amber-400 text-sm">⚡</span>
-          <span class="font-extrabold">Control Hub</span>
+          <span>Download JSON</span>
           <span id="savedCountBadge" class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-black min-w-[20px] text-center">0</span>
         </button>
       </div>
@@ -113,7 +112,6 @@
             onclick="toggleAutomationEngine()"
             class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-extrabold text-xs shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <span>🚀</span>
             <span id="btnAutomationText">Start Automation Engine</span>
           </button>
         </div>
@@ -221,7 +219,7 @@
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
                 title="Copies 10-digit number without +1"
               >
-                <span>📋</span> Copy Number <span class="text-[10px] opacity-90 font-normal">(no +1)</span>
+                Copy Number <span class="text-[10px] opacity-90 font-normal">(no +1)</span>
               </button>
             </div>
 
@@ -328,14 +326,14 @@
                 id="btnCopyHeadlineAndBio"
                 onclick="copyHeadlineAndBioTogether()" 
                 class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer whitespace-nowrap"
-                title="Copies both Headline & Bio (also added separately to clipboard history)"
+                title="Copies both Headline & Bio"
               >
-                <span>📋</span> Copy
+                Copy
               </button>
             </div>
           </div>
 
-          <!-- Post / Bio (Balanced 5-line height, Large font, native Emojis) -->
+          <!-- Post / Bio (Balanced 5-line height, Large font) -->
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="text-xs font-bold text-slate-700">Post / Bio:</label>
@@ -345,7 +343,7 @@
               id="txtPostBio" 
               rows="4" 
               class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 focus:outline-none focus:border-brand-600 focus:bg-white transition-colors leading-relaxed resize-none font-normal"
-            >Always down for a spontaneous road trip or just finding the best local espresso spot. Looking for someone witty, kind, and ready for some genuine laughs. Let's skip the small talk and plan something fun. ✨ vibes 🥂</textarea>
+            >Always down for a spontaneous road trip or just finding the best local espresso spot. Looking for someone witty, kind, and ready for some genuine laughs. Let's skip the small talk and plan something fun.</textarea>
           </div>
 
           <!-- Bottom Actions: AI Generate Post & Save Profile with Custom Name -->
@@ -355,7 +353,7 @@
               id="btnAiGen" 
               class="w-full py-3 px-3 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-700 hover:to-amber-700 active:from-brand-800 active:to-amber-800 text-white text-xs sm:text-sm font-black shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
-              <span>✨</span> AI Generate Post
+              AI Generate Post
             </button>
             <button 
               onclick="promptSaveProfileWithCustomName()" 
@@ -363,7 +361,7 @@
               class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs sm:text-sm font-black shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
               title="Save this verified phone number, IP and persona to Neon Database with a custom name"
             >
-              <span>💾</span> Save Profile
+              Save Profile
             </button>
           </div>
 
@@ -374,123 +372,106 @@
     </div>
   </main>
 
-  <!-- ================= SLIDE-OVER DRAWER: CONTROL HUB & SAVED PROFILES ================= -->
-  <div id="savedDrawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+  <!-- ================= JSON EXPORT MODAL (DATE SELECTOR & FULL DATA DOWNLOAD) ================= -->
+  <div id="jsonExportModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="jsonModalTitle" role="dialog" aria-modal="true">
     <!-- Backdrop -->
-    <div id="savedDrawerBackdrop" onclick="toggleSavedDrawer(false)" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 cursor-pointer"></div>
-    
-    <div class="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10 pointer-events-none">
-      <div id="savedDrawerPanel" class="w-screen max-w-md sm:max-w-xl bg-white shadow-2xl flex flex-col pointer-events-auto transform transition-transform duration-300 ease-in-out translate-x-full">
-        
-        <!-- Drawer Header -->
-        <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
+    <div id="jsonExportModalBackdrop" onclick="toggleJsonExportModal(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 cursor-pointer"></div>
+
+    <div class="flex min-h-full items-center justify-center p-4 text-center">
+      <div id="jsonExportModalPanel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full max-w-lg p-5 sm:p-6 border border-slate-100 scale-95 opacity-0">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
           <div>
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-1.5">
-                <span class="text-amber-500">⚡</span> Control Hub & Database
-              </h3>
-              <span id="drawerDbStatus" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Neon PostgreSQL
-              </span>
-            </div>
-            <p class="text-[11px] text-slate-500 mt-0.5">সব সেভ করা আইপি, নম্বর, হেডলাইন ও বায়ো হিস্ট্রি এখানে সংরক্ষিত রয়েছে।</p>
+            <h3 class="text-base font-black text-slate-900" id="jsonModalTitle">Download JSON Profiles</h3>
+            <p class="text-[11px] font-medium text-slate-500 mt-0.5">Filter saved database profiles by date and download complete records.</p>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="loadSavedProfiles()" class="p-2 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-slate-200/60 transition-colors cursor-pointer" title="Refresh from Neon Database">
-              🔄
-            </button>
-            <button onclick="toggleSavedDrawer(false)" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer text-sm font-bold" title="Close">
-              ✕
-            </button>
-          </div>
-        </div>
-
-        <!-- Hub Actions & Controls (Save to DB, Preset, System Status) -->
-        <div class="p-4 bg-slate-50/90 border-b border-slate-200 space-y-3">
-          <div class="flex items-center justify-between text-[11px] font-black text-slate-500 uppercase tracking-wider">
-            <span>⚡ Control Actions</span>
-            <span class="text-emerald-600 font-bold flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live Synced
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <!-- Save Current Profile to Database -->
-            <button 
-              onclick="promptSaveProfileWithCustomName()" 
-              id="btnSaveToDb"
-              class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              title="Save current verified profile, proxy, and bio to Neon Database"
-            >
-              <span>💾</span> Save Current to DB
-            </button>
-
-            <!-- Load Preset Persona -->
-            <button 
-              onclick="actionRandomPreset()" 
-              class="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              title="Load a random dating & social bio preset"
-            >
-              <span>🎲</span> Load Preset Bio
-            </button>
-          </div>
-
-          <!-- Backend System Engine Status -->
-          <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 text-[10px] space-y-1 text-slate-600">
-            <div class="flex items-center justify-between font-bold text-slate-800 mb-0.5">
-              <span>Backend Engines</span>
-              <span class="text-emerald-600 font-black">All Active 🟢</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-slate-500">AI Engine:</span>
-              <span class="font-mono font-semibold text-brand-600">Gemini 3.5 Flash Lite</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-slate-500">Database:</span>
-              <span class="font-mono font-semibold text-emerald-600">Neon PostgreSQL (AWS us-east-1)</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-slate-500">IP Fraud Shield:</span>
-              <span class="font-mono font-semibold text-slate-700">Scamalytics Free Live API</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Search & Export Bar -->
-        <div class="p-3.5 border-b border-slate-100 flex items-center gap-2 bg-white">
-          <div class="relative flex-1">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
-            <input 
-              id="inputDrawerSearch" 
-              type="text" 
-              placeholder="Search by phone, IP, carrier, headline..." 
-              oninput="renderSavedProfilesList()"
-              class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-3 py-1.5 text-xs focus:outline-none focus:border-brand-600"
-            />
-          </div>
-          <button onclick="exportSavedProfilesCsv()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer" title="Download all profiles as CSV">
-            <span>📥</span> Export CSV
+          <button 
+            type="button" 
+            onclick="toggleJsonExportModal(false)" 
+            class="text-slate-400 hover:text-slate-700 text-sm font-bold p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Close"
+          >
+            ✕
           </button>
         </div>
 
-        <!-- Saved Profiles List Container -->
-        <div id="savedProfilesList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll bg-slate-50/40">
-          <div class="text-center py-12 text-slate-400 text-xs">Loading saved profiles from Neon DB...</div>
-        </div>
-
-        <!-- Drawer Footer -->
-        <div class="p-3.5 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
-          <div class="flex items-center gap-1.5">
-            <span>Total:</span>
-            <strong id="lblTotalSaved" class="text-brand-600 font-extrabold text-sm font-mono">0</strong>
-            <span class="text-slate-400 text-[11px]">profiles in Neon DB</span>
+        <!-- Date Filter Section -->
+        <div class="space-y-4">
+          <div>
+            <label for="inputExportDate" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Select Export Date:
+            </label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="date" 
+                id="inputExportDate" 
+                onchange="onExportDateChanged()"
+                class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-500/20 transition-all cursor-pointer"
+              />
+              <button 
+                type="button" 
+                onclick="setExportDateToday()" 
+                class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+              >
+                Today
+              </button>
+              <button 
+                type="button" 
+                onclick="clearExportDate()" 
+                class="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+              >
+                All Dates
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Leave empty or click "All Dates" to download all saved profiles.</p>
           </div>
-          <button onclick="toggleSavedDrawer(false)" class="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer">Close ✕</button>
-        </div>
 
+          <!-- Matching Records Summary Card -->
+          <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-200/80 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 font-medium">Selected Filter:</span>
+              <span id="lblExportSelectedFilter" class="font-bold text-slate-800">All Saved Profiles</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 font-medium">Matching Profiles:</span>
+              <span class="font-bold text-brand-600"><span id="lblExportMatchCount" class="font-mono text-sm">0</span> records</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500">
+              <span class="font-bold text-slate-700 block mb-1">Included Information:</span>
+              <div class="flex flex-wrap gap-1 text-[10px]">
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">IP & Location</span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">Fraud Score</span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">Phone & Carrier</span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">Headline & Post</span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">DOB & Age</span>
+                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-600">Timestamp</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Strictly Zero Emojis) -->
+          <div class="pt-2 flex items-center justify-end gap-2.5">
+            <button 
+              type="button" 
+              onclick="toggleJsonExportModal(false)" 
+              class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button 
+              type="button" 
+              id="btnExecuteDownloadJson" 
+              onclick="executeDownloadJson()" 
+              class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-black shadow-md shadow-brand-600/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              Download JSON
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+
   <!-- ================= CUSTOM PROFILE NAME SAVE MODAL ================= -->
   <div id="saveProfileModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="saveModalTitle" role="dialog" aria-modal="true">
     <!-- Backdrop -->
@@ -501,7 +482,6 @@
         <!-- Header -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
           <div class="flex items-center gap-2">
-            <span class="text-xl">💾</span>
             <h3 class="text-base font-black text-slate-900" id="saveModalTitle">Save Profile to Database</h3>
           </div>
           <button onclick="closeSaveModal()" class="text-slate-400 hover:text-slate-700 text-sm font-bold p-1 cursor-pointer">✕</button>
@@ -553,7 +533,7 @@
               id="btnConfirmModalSave" 
               class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-black shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <span>💾</span> Confirm & Save
+              Confirm & Save
             </button>
           </div>
         </form>
@@ -787,7 +767,7 @@
       }
 
       isRunning = true;
-      document.getElementById('btnAutomationText').textContent = '⏹️ Stop Automation';
+      document.getElementById('btnAutomationText').textContent = 'Stop Automation';
       document.getElementById('btnAutomationToggle').className = 'w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-md shadow-rose-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer';
       document.getElementById('progressBar').style.width = '15%';
       document.getElementById('lblLoopStatus').textContent = 'Step 1: Connecting & querying Scamalytics...';
@@ -798,7 +778,7 @@
 
     function stopAutomation() {
       isRunning = false;
-      document.getElementById('btnAutomationText').textContent = '🚀 Start Automation Engine';
+      document.getElementById('btnAutomationText').textContent = 'Start Automation Engine';
       document.getElementById('btnAutomationToggle').className = 'w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer';
       document.getElementById('lblLoopStatus').textContent = 'Automation stopped by user.';
       document.getElementById('pulseDot').className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
@@ -982,7 +962,7 @@
     // 4. AI Persona Generation (Gemini 3.5 Flash Lite)
     async function actionAiGenerate(silent = false) {
       const btn = document.getElementById('btnAiGen');
-      btn.innerHTML = '<span>⏳</span> Generating AI...';
+      btn.innerHTML = 'Generating AI...';
       btn.disabled = true;
 
       try {
@@ -996,7 +976,7 @@
       } catch (e) {
         actionRandomPreset();
       } finally {
-        btn.innerHTML = '<span>✨</span> AI Generate Post';
+        btn.innerHTML = 'AI Generate Post';
         btn.disabled = false;
       }
     }
@@ -1105,7 +1085,7 @@
       }
 
       const btn = document.getElementById('btnCopyHeadlineAndBio');
-      const origHtml = btn ? btn.innerHTML : '<span>📋</span> Copy';
+      const origHtml = btn ? btn.innerHTML : 'Copy';
 
       // 1. Put Bio separately into clipboard history (silent)
       if (bio) {
@@ -1124,7 +1104,7 @@
       await copyToClipboard(combined, 'Copied Headline & Post/Bio! (Separate in history) 📋', '📋');
 
       if (btn) {
-        btn.innerHTML = '<span>✅</span> Copied!';
+        btn.innerHTML = 'Copied!';
         btn.classList.add('bg-emerald-600');
         setTimeout(() => {
           btn.innerHTML = origHtml;
@@ -1251,9 +1231,9 @@ ${bio}
     async function saveCurrentProfileToDb(customName) {
       const nameToSave = (customName || '').trim() || 'Verified Persona';
       const btn = document.getElementById('btnSaveProfileDirect') || document.getElementById('btnSaveToDb');
-      const originalHtml = btn ? btn.innerHTML : '<span>💾</span> Save Profile';
+      const originalHtml = btn ? btn.innerHTML : 'Save Profile';
       if (btn) {
-        btn.innerHTML = '<span>⏳</span> Saving to DB...';
+        btn.innerHTML = 'Saving to DB...';
         btn.disabled = true;
       }
 
@@ -1324,7 +1304,7 @@ ${bio}
         if (resp.ok && res.success) {
           showToast(`Saved "${nameToSave}" to Database! 💾`, '💾');
           if (btn) {
-            btn.innerHTML = '<span>✅</span> Saved!';
+            btn.innerHTML = 'Saved!';
             btn.classList.add('bg-emerald-700');
           }
           await loadSavedProfiles();
@@ -1361,253 +1341,33 @@ ${bio}
 
           const badge = document.getElementById('savedCountBadge');
           if (badge) badge.textContent = count;
-          const badgeBottom = document.getElementById('savedCountBadgeBottom');
-          if (badgeBottom) badgeBottom.textContent = count;
-          const totalLbl = document.getElementById('lblTotalSaved');
-          if (totalLbl) totalLbl.textContent = count;
-
-          const statusLbl = document.getElementById('drawerDbStatus');
-          if (statusLbl) {
-            statusLbl.innerHTML = data.hasNeonDb
-              ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Neon PostgreSQL'
-              : '<span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Storage';
-          }
-          renderSavedProfilesList();
+          updateExportFilterCount();
         }
       } catch (e) {
         console.warn('Load profiles error:', e);
       }
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function copySavedNumber(idx) {
-      const item = savedProfiles[idx];
-      if (item && item.phone_number) {
-        copyToClipboard(item.phone_number, `Copied ${item.phone_number}!`, '📋');
-      }
-    }
-
-    function copySavedBio(idx) {
-      const item = savedProfiles[idx];
-      if (item && item.post_bio) {
-        copyToClipboard(item.post_bio, 'Copied Saved Bio!', '📋');
-      }
-    }
-
-    function copySavedAll(idx) {
-      const item = savedProfiles[idx];
-      if (!item) return;
-      const block = `=== SAVED PERSONA PROFILE ===
-Profile Name: ${item.profile_name || 'Verified Persona'}
-Phone Number: ${item.phone_number} (${item.phone_formatted || item.phone_number})
-Carrier: ${item.carrier || 'Real Mobile'}
-Proxy IP: ${item.ip_address || '—'}
-Location: ${item.location || 'USA'}
-Fraud Score: ${item.fraud_score ?? 0}/100
-DOB: ${item.dob || '—'} (Age: ${item.age || '—'})
-Headline: ${item.headline || '—'}
-Post / Bio:
-${item.post_bio || '—'}
-=============================`;
-      copyToClipboard(block, `Copied Saved Profile for ${item.profile_name || item.phone_number}!`, '⭐');
-    }
-
-    function loadSavedProfileToDashboard(idx) {
-      const item = savedProfiles[idx];
-      if (!item) return;
-
-      currentWinner = {
-        phone: item.phone_formatted || `+1 ${item.phone_number}`,
-        cleanPhone: item.phone_number,
-        carrier: item.carrier || 'Real Mobile',
-        type: item.line_type || 'MOBILE',
-        region: item.region || 'USA',
-        local: item.local_format || item.phone_number,
-        timezone: item.timezone || 'America/Chicago',
-        country: item.country || 'United States 🇺🇸'
-      };
-
-      currentProxyDetails.ip = item.ip_address || '104.28.194.5';
-      currentProxyDetails.location = item.location || 'Dallas, TX';
-      currentProxyDetails.fraudScore = item.fraud_score ?? 26;
-      currentProxyDetails.trustScore = item.trust_score ?? 74;
-
-      document.getElementById('lblWinnerNumber').textContent = currentWinner.phone;
-      document.getElementById('lblWinnerCarrier').innerHTML = `Carrier: <span class="text-slate-800 font-bold">${currentWinner.carrier}</span>`;
-      document.getElementById('lblWinnerTitle').textContent = `✅ Real Mobile SIM Verified (${currentWinner.carrier})`;
-      document.getElementById('metricCarrier').textContent = currentWinner.carrier;
-      document.getElementById('metricType').textContent = currentWinner.type;
-      document.getElementById('metricRegion').textContent = currentWinner.region;
-      document.getElementById('metricLocal').textContent = currentWinner.local;
-      document.getElementById('metricTimezone').textContent = currentWinner.timezone;
-
-      document.getElementById('lblDetIp').textContent = currentProxyDetails.ip;
-      document.getElementById('lblDetGeo').textContent = currentProxyDetails.location;
-      document.getElementById('lblDetFraudScore').textContent = `${currentProxyDetails.fraudScore} / 100`;
-
-      if (item.headline) document.getElementById('inputHeadline').value = item.headline;
-      if (item.post_bio) document.getElementById('txtPostBio').value = item.post_bio;
-
-      toggleSavedDrawer(false);
-      showToast(`Loaded ${item.profile_name || item.phone_number} to dashboard! 🎯`, '🎯');
-    }
-
-    function renderSavedProfilesList() {
-      const container = document.getElementById('savedProfilesList');
-      if (!container) return;
-
-      const q = (document.getElementById('inputDrawerSearch')?.value || '').toLowerCase().trim();
-
-      const filtered = savedProfiles.map((item, originalIndex) => ({ item, originalIndex })).filter(({ item }) => {
-        if (!q) return true;
-        return (item.profile_name || '').toLowerCase().includes(q) ||
-               (item.phone_number || '').toLowerCase().includes(q) ||
-               (item.carrier || '').toLowerCase().includes(q) ||
-               (item.ip_address || '').toLowerCase().includes(q) ||
-               (item.location || '').toLowerCase().includes(q) ||
-               (item.headline || '').toLowerCase().includes(q);
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-16 bg-white rounded-xl border border-dashed border-slate-200 p-6">
-            <div class="text-3xl mb-2">📭</div>
-            <div class="text-xs font-bold text-slate-700">No saved profiles found</div>
-            <div class="text-[11px] text-slate-400 mt-1">Click "💾 Save Profile" on any verified number to store it in your Neon PostgreSQL database.</div>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = filtered.map(({ item, originalIndex }) => {
-        const score = Number(item.fraud_score) || 0;
-        const scoreBadgeClass = score <= 30 
-          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-          : (score <= 70 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200');
-        const displayName = item.profile_name || 'Verified Persona';
-
-        return `
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs hover:border-brand-400 hover:shadow-sm transition-all">
-          <!-- Top Row: Custom Profile Name & Actions -->
-          <div class="flex items-center justify-between mb-1.5 gap-2">
-            <div class="flex items-center gap-2 overflow-hidden">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
-              <span class="font-black text-sm text-slate-900 truncate" title="${escapeHtml(displayName)}">
-                ${escapeHtml(displayName)}
-              </span>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">${escapeHtml(item.carrier || 'Real Mobile')}</span>
-              <button onclick="deleteProfileFromDb('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs p-1 cursor-pointer transition-colors" title="Delete from Database">🗑️</button>
-            </div>
-          </div>
-
-          <!-- Secondary Row: Phone Number & Location -->
-          <div class="flex items-center gap-2 mb-2 text-xs">
-            <span class="font-mono font-black text-brand-600">${escapeHtml(item.phone_number)}</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-[11px] font-semibold text-slate-600 truncate">${escapeHtml(item.location || 'USA')}</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 mb-2.5 bg-slate-50/80 p-2 rounded-lg border border-slate-100">
-            <div><span class="text-slate-400 font-medium">IP:</span> <span class="font-mono font-bold text-slate-800">${escapeHtml(item.ip_address || '—')}</span></div>
-            <div><span class="text-slate-400 font-medium">Fraud:</span> <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${scoreBadgeClass}">${score}/100</span></div>
-            <div><span class="text-slate-400 font-medium">Timezone:</span> <span class="text-slate-800 font-semibold truncate block">${escapeHtml(item.timezone || 'America/Detroit')}</span></div>
-            <div><span class="text-slate-400 font-medium">DOB:</span> <span class="text-slate-800 font-semibold">${escapeHtml(item.dob || '—')} (${item.age || '—'} yrs)</span></div>
-          </div>
-
-          <div class="bg-slate-50/60 rounded-lg p-2.5 border border-slate-100 text-xs mb-3">
-            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1">
-              <span>💬</span> <span>${escapeHtml(item.headline || '—')}</span>
-            </div>
-            <div class="text-slate-600 text-[11px] leading-relaxed line-clamp-3 whitespace-pre-line">${escapeHtml(item.post_bio || '—')}</div>
-          </div>
-
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[10px]">
-            <span class="text-slate-400">🕒 ${item.created_at ? new Date(item.created_at).toLocaleString() : 'Just now'}</span>
-            <div class="flex items-center gap-2">
-              <button onclick="copySavedNumber(${originalIndex})" class="px-2 py-1 rounded bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold transition-colors cursor-pointer" title="Copy 10-digit number">Copy No.</button>
-              <button onclick="copySavedBio(${originalIndex})" class="px-2 py-1 rounded bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold transition-colors cursor-pointer" title="Copy Bio">Copy Bio</button>
-              <button onclick="copySavedAll(${originalIndex})" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer" title="Copy full persona summary">Copy All</button>
-              <button onclick="loadSavedProfileToDashboard(${originalIndex})" class="px-2 py-1 rounded bg-brand-600 hover:bg-brand-700 text-white font-bold transition-colors cursor-pointer" title="Load this into the main dashboard">🎯 Load</button>
-            </div>
-          </div>
-        </div>
-        `;
-      }).join('');
-    }
-
-    async function deleteProfileFromDb(id) {
-      if (!confirm('Are you sure you want to delete this profile from database?')) return;
-      try {
-        const resp = await fetch(`/api/profiles?id=${id}`, { method: 'DELETE' });
-        if (resp.ok) {
-          showToast('Profile deleted from database!', '🗑️');
-          await loadSavedProfiles();
-        }
-      } catch (e) {
-        showToast('Delete error: ' + e.message, '⚠️');
-      }
-    }
-
-    function exportSavedProfilesCsv() {
-      if (!savedProfiles || savedProfiles.length === 0) {
-        showToast('No saved profiles to export!', '⚠️');
-        return;
-      }
-      const headers = ["Profile Name", "Phone", "Carrier", "IP", "Fraud Score", "Location", "DOB", "Age", "Headline", "Bio", "Date"];
-      const rows = savedProfiles.map(p => [
-        `"${(p.profile_name || 'Verified Persona').replace(/"/g, '""')}"`,
-        `"${p.phone_number}"`,
-        `"${p.carrier}"`,
-        `"${p.ip_address}"`,
-        `"${p.fraud_score}"`,
-        `"${p.location}"`,
-        `"${p.dob}"`,
-        `"${p.age}"`,
-        `"${(p.headline || '').replace(/"/g, '""')}"`,
-        `"${(p.post_bio || '').replace(/"/g, '""')}"`,
-        `"${p.created_at}"`
-      ]);
-
-      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `saved_profiles_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // 8. Drawer & Modal Toggles
-    function toggleSavedDrawer(open) {
-      const drawer = document.getElementById('savedDrawer');
-      const backdrop = document.getElementById('savedDrawerBackdrop');
-      const panel = document.getElementById('savedDrawerPanel');
-      if (!drawer) return;
+    // 8. JSON Export Modal & Date-filtered Download Engine
+    function toggleJsonExportModal(open) {
+      const modal = document.getElementById('jsonExportModal');
+      const backdrop = document.getElementById('jsonExportModalBackdrop');
+      const panel = document.getElementById('jsonExportModalPanel');
+      if (!modal) return;
 
       if (open) {
-        drawer.classList.remove('hidden');
+        modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
         loadSavedProfiles();
+        updateExportFilterCount();
         requestAnimationFrame(() => {
           if (backdrop) {
             backdrop.classList.remove('opacity-0');
             backdrop.classList.add('opacity-100');
           }
           if (panel) {
-            panel.classList.remove('translate-x-full');
-            panel.classList.add('translate-x-0');
+            panel.classList.remove('scale-95', 'opacity-0');
+            panel.classList.add('scale-100', 'opacity-100');
           }
         });
       } else {
@@ -1616,20 +1376,138 @@ ${item.post_bio || '—'}
           backdrop.classList.add('opacity-0');
         }
         if (panel) {
-          panel.classList.remove('translate-x-0');
-          panel.classList.add('translate-x-full');
+          panel.classList.remove('scale-100', 'opacity-100');
+          panel.classList.add('scale-95', 'opacity-0');
         }
         document.body.classList.remove('overflow-hidden');
         setTimeout(() => {
-          drawer.classList.add('hidden');
-        }, 300);
+          modal.classList.add('hidden');
+        }, 220);
       }
     }
 
-    // Global Escape Key Listener to Close Drawer
+    function getFilteredProfilesForExport() {
+      const filterDate = (document.getElementById('inputExportDate')?.value || '').trim();
+      if (!filterDate) {
+        return { filterDate: '', profiles: savedProfiles };
+      }
+
+      const matched = savedProfiles.filter(p => {
+        if (!p.created_at) return false;
+        if (typeof p.created_at === 'string' && p.created_at.startsWith(filterDate)) {
+          return true;
+        }
+        try {
+          const d = new Date(p.created_at);
+          if (isNaN(d.getTime())) return false;
+          const yr = d.getFullYear();
+          const mo = String(d.getMonth() + 1).padStart(2, '0');
+          const da = String(d.getDate()).padStart(2, '0');
+          const localYmd = `${yr}-${mo}-${da}`;
+          return localYmd === filterDate;
+        } catch (e) {
+          return false;
+        }
+      });
+
+      return { filterDate, profiles: matched };
+    }
+
+    function updateExportFilterCount() {
+      const { filterDate, profiles } = getFilteredProfilesForExport();
+      const countEl = document.getElementById('lblExportMatchCount');
+      const filterEl = document.getElementById('lblExportSelectedFilter');
+      if (countEl) countEl.textContent = profiles.length;
+      if (filterEl) {
+        filterEl.textContent = filterDate ? `Date: ${filterDate}` : 'All Saved Profiles';
+      }
+    }
+
+    function onExportDateChanged() {
+      updateExportFilterCount();
+    }
+
+    function setExportDateToday() {
+      const today = new Date();
+      const yr = today.getFullYear();
+      const mo = String(today.getMonth() + 1).padStart(2, '0');
+      const da = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yr}-${mo}-${da}`;
+      const input = document.getElementById('inputExportDate');
+      if (input) input.value = todayStr;
+      updateExportFilterCount();
+    }
+
+    function clearExportDate() {
+      const input = document.getElementById('inputExportDate');
+      if (input) input.value = '';
+      updateExportFilterCount();
+    }
+
+    function executeDownloadJson() {
+      if (!savedProfiles || savedProfiles.length === 0) {
+        showToast('No saved profiles in database to download!', '⚠️');
+        return;
+      }
+
+      const { filterDate, profiles } = getFilteredProfilesForExport();
+      if (!profiles || profiles.length === 0) {
+        showToast(`No profiles found for ${filterDate || 'selected filter'}!`, '⚠️');
+        return;
+      }
+
+      // Build complete, rich JSON payload containing all verified information
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        filter_date: filterDate || 'ALL_DATES',
+        total_records: profiles.length,
+        profiles: profiles.map(p => ({
+          id: p.id,
+          profile_name: p.profile_name || 'Verified Persona',
+          phone_number: p.phone_number,
+          phone_formatted: p.phone_formatted || (p.phone_number ? `+1 ${p.phone_number}` : ''),
+          carrier: p.carrier || 'Real Mobile',
+          line_type: p.line_type || 'MOBILE',
+          region: p.region || '',
+          local_format: p.local_format || '',
+          timezone: p.timezone || '',
+          country: p.country || 'United States',
+          ip_address: p.ip_address || '',
+          location: p.location || '',
+          fraud_score: p.fraud_score !== undefined ? Number(p.fraud_score) : 0,
+          trust_score: p.trust_score !== undefined ? Number(p.trust_score) : 100,
+          connection_type: p.connection_type || 'Residential',
+          threat_flags: p.threat_flags || 'Proxy: No | VPN: No',
+          dob: p.dob || '',
+          age: p.age !== undefined ? Number(p.age) : null,
+          headline: p.headline || '',
+          post_bio: p.post_bio || '',
+          created_at: p.created_at || null
+        }))
+      };
+
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement('a');
+      const filename = filterDate ? `profiles_${filterDate}.json` : `profiles_all_${Date.now()}.json`;
+
+      downloadAnchor.setAttribute('href', url);
+      downloadAnchor.setAttribute('download', filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      document.body.removeChild(downloadAnchor);
+      URL.revokeObjectURL(url);
+
+      showToast(`Downloaded ${profiles.length} profiles as ${filename}!`, '📥');
+      toggleJsonExportModal(false);
+    }
+
+    // Global Escape Key Listener to Close Modals
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        toggleSavedDrawer(false);
+        toggleJsonExportModal(false);
+        closeSaveModal();
       }
     });
 
