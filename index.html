@@ -66,10 +66,10 @@
       <!-- Header Actions -->
       <div class="flex items-center gap-2 sm:gap-3">
         <!-- View Saved Database Records Drawer Button -->
-        <button id="btnOpenDrawer" onclick="toggleSavedDrawer(true)" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all shadow-xs">
+        <button id="btnOpenDrawer" onclick="toggleSavedDrawer(true)" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all shadow-xs cursor-pointer" title="View all saved records in Neon Database">
           <span>📁</span>
-          <span>Saved Profiles</span>
-          <span id="savedCountBadge" class="px-1.5 py-0.2 rounded-full bg-brand-600 text-white text-[10px] font-extrabold min-w-[18px] text-center">0</span>
+          <span>Saved Info (Database)</span>
+          <span id="savedCountBadge" class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-extrabold min-w-[20px] text-center">0</span>
         </button>
 
         <!-- Settings Modal Button -->
@@ -366,6 +366,16 @@
                 <span>💾</span> Save to Database
               </button>
 
+              <!-- View Saved Database Records Button -->
+              <button 
+                onclick="toggleSavedDrawer(true)" 
+                id="btnOpenDrawerBottom"
+                class="px-3.5 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 active:bg-brand-200 text-brand-700 border border-brand-200 text-xs font-extrabold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="View all saved profiles in Neon PostgreSQL Database"
+              >
+                <span>📁</span> Saved Info (<span id="savedCountBadgeBottom">0</span>)
+              </button>
+
               <button onclick="copyAllPersonaData()" class="px-4 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer">
                 <span>⭐</span> Copy All Data
               </button>
@@ -380,53 +390,68 @@
   </main>
 
   <!-- ================= SLIDE-OVER DRAWER: SAVED DATABASE PROFILES ================= -->
-  <div id="savedDrawer" class="fixed inset-0 z-50 overflow-hidden pointer-events-none transition-opacity duration-300 opacity-0">
+  <div id="savedDrawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
     <!-- Backdrop -->
-    <div onclick="toggleSavedDrawer(false)" class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
+    <div id="savedDrawerBackdrop" onclick="toggleSavedDrawer(false)" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 cursor-pointer"></div>
     
-    <div class="fixed inset-y-0 right-0 max-w-full flex pl-10 pointer-events-auto">
-      <div class="w-screen max-w-md sm:max-w-xl bg-white shadow-2xl flex flex-col">
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10 pointer-events-none">
+      <div id="savedDrawerPanel" class="w-screen max-w-md sm:max-w-xl bg-white shadow-2xl flex flex-col pointer-events-auto transform transition-transform duration-300 ease-in-out translate-x-full">
         
         <!-- Drawer Header -->
-        <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="text-base font-extrabold text-slate-900">📁 Saved Profiles (Database)</h3>
-              <span id="drawerDbStatus" class="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200">
-                Neon DB
+              <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-1.5">
+                <span>📁</span> Saved Info (Database)
+              </h3>
+              <span id="drawerDbStatus" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Neon PostgreSQL
               </span>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">সব সেভ করা আইপি, নম্বর, হেডলাইন ও বায়ো হিস্ট্রি এখানে সংরক্ষিত রয়েছে।</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">সব সেভ করা আইপি, নম্বর, হেডলাইন ও বায়ো হিস্ট্রি এখানে সংরক্ষিত রয়েছে।</p>
           </div>
-          <button onclick="toggleSavedDrawer(false)" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors">
-            ✕
-          </button>
+          <div class="flex items-center gap-1">
+            <button onclick="loadSavedProfiles()" class="p-2 rounded-lg text-slate-500 hover:text-brand-600 hover:bg-slate-200/60 transition-colors cursor-pointer" title="Refresh from Neon Database">
+              🔄
+            </button>
+            <button onclick="toggleSavedDrawer(false)" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer text-sm font-bold" title="Close">
+              ✕
+            </button>
+          </div>
         </div>
 
         <!-- Search & Export Bar -->
-        <div class="p-4 border-b border-slate-100 flex items-center gap-2 bg-white">
-          <input 
-            id="inputDrawerSearch" 
-            type="text" 
-            placeholder="Search by phone, IP, carrier..." 
-            oninput="renderSavedProfilesList()"
-            class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-brand-600"
-          />
-          <button onclick="exportSavedProfilesCsv()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors">
-            Export CSV
+        <div class="p-3.5 border-b border-slate-100 flex items-center gap-2 bg-white">
+          <div class="relative flex-1">
+            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+            <input 
+              id="inputDrawerSearch" 
+              type="text" 
+              placeholder="Search by phone, IP, carrier, headline..." 
+              oninput="renderSavedProfilesList()"
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-3 py-1.5 text-xs focus:outline-none focus:border-brand-600"
+            />
+          </div>
+          <button onclick="exportSavedProfilesCsv()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer" title="Download all profiles as CSV">
+            <span>📥</span> Export CSV
           </button>
         </div>
 
         <!-- Saved Profiles List Container -->
         <div id="savedProfilesList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll bg-slate-50/40">
           <!-- Populated by JavaScript -->
-          <div class="text-center py-12 text-slate-400 text-xs">Loading saved profiles...</div>
+          <div class="text-center py-12 text-slate-400 text-xs">Loading saved profiles from Neon DB...</div>
         </div>
 
         <!-- Drawer Footer -->
-        <div class="p-4 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
-          <span>Total: <strong id="lblTotalSaved" class="text-slate-800">0</strong> profiles</span>
-          <span class="text-[11px] text-slate-400">Only user-saved records are stored</span>
+        <div class="p-3.5 border-t border-slate-200 bg-white flex items-center justify-between text-xs text-slate-500">
+          <div class="flex items-center gap-1.5">
+            <span>Total:</span>
+            <strong id="lblTotalSaved" class="text-brand-600 font-extrabold text-sm font-mono">0</strong>
+            <span class="text-slate-400 text-[11px]">profiles in Neon DB</span>
+          </div>
+          <button onclick="toggleSavedDrawer(false)" class="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer">Close ✕</button>
         </div>
 
       </div>
@@ -994,12 +1019,20 @@ ${bio}
           const data = await resp.json();
           savedProfiles = data.profiles || [];
           const count = savedProfiles.length;
+
           const badge = document.getElementById('savedCountBadge');
           if (badge) badge.textContent = count;
+          const badgeBottom = document.getElementById('savedCountBadgeBottom');
+          if (badgeBottom) badgeBottom.textContent = count;
           const totalLbl = document.getElementById('lblTotalSaved');
           if (totalLbl) totalLbl.textContent = count;
+
           const statusLbl = document.getElementById('drawerDbStatus');
-          if (statusLbl) statusLbl.textContent = data.hasNeonDb ? 'Neon PostgreSQL' : 'Local Storage';
+          if (statusLbl) {
+            statusLbl.innerHTML = data.hasNeonDb
+              ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Neon PostgreSQL'
+              : '<span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Storage';
+          }
           renderSavedProfilesList();
         }
       } catch (e) {
@@ -1048,6 +1081,46 @@ ${item.post_bio || '—'}
       copyToClipboard(block, `Copied Saved Profile for ${item.phone_number}!`, '⭐');
     }
 
+    function loadSavedProfileToDashboard(idx) {
+      const item = savedProfiles[idx];
+      if (!item) return;
+
+      currentWinner = {
+        phone: item.phone_formatted || `+1 ${item.phone_number}`,
+        cleanPhone: item.phone_number,
+        carrier: item.carrier || 'Real Mobile',
+        type: item.line_type || 'MOBILE',
+        region: item.region || 'Texas (TX)',
+        local: item.local_format || item.phone_number,
+        timezone: item.timezone || 'America/Chicago',
+        country: item.country || 'United States 🇺🇸'
+      };
+
+      currentProxyDetails.ip = item.ip_address || '104.28.194.5';
+      currentProxyDetails.location = item.location || 'Dallas, TX';
+      currentProxyDetails.fraudScore = item.fraud_score ?? 26;
+      currentProxyDetails.trustScore = item.trust_score ?? 74;
+
+      document.getElementById('lblWinnerNumber').textContent = currentWinner.phone;
+      document.getElementById('lblWinnerCarrier').innerHTML = `Carrier: <span class="text-slate-800 font-bold">${currentWinner.carrier}</span>`;
+      document.getElementById('lblWinnerTitle').textContent = `✅ Real Mobile SIM Verified (${currentWinner.carrier})`;
+      document.getElementById('metricCarrier').textContent = currentWinner.carrier;
+      document.getElementById('metricType').textContent = currentWinner.type;
+      document.getElementById('metricRegion').textContent = currentWinner.region;
+      document.getElementById('metricLocal').textContent = currentWinner.local;
+      document.getElementById('metricTimezone').textContent = currentWinner.timezone;
+
+      document.getElementById('lblDetIp').textContent = currentProxyDetails.ip;
+      document.getElementById('lblDetGeo').textContent = currentProxyDetails.location;
+      document.getElementById('lblDetFraudScore').textContent = `${currentProxyDetails.fraudScore} / 100`;
+
+      if (item.headline) document.getElementById('inputHeadline').value = item.headline;
+      if (item.post_bio) document.getElementById('txtPostBio').value = item.post_bio;
+
+      toggleSavedDrawer(false);
+      showToast(`Loaded ${item.phone_number} to dashboard! 🎯`, '🎯');
+    }
+
     function renderSavedProfilesList() {
       const container = document.getElementById('savedProfilesList');
       if (!container) return;
@@ -1059,53 +1132,64 @@ ${item.post_bio || '—'}
         return (item.phone_number || '').toLowerCase().includes(q) ||
                (item.carrier || '').toLowerCase().includes(q) ||
                (item.ip_address || '').toLowerCase().includes(q) ||
+               (item.location || '').toLowerCase().includes(q) ||
                (item.headline || '').toLowerCase().includes(q);
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-16">
+          <div class="text-center py-16 bg-white rounded-xl border border-dashed border-slate-200 p-6">
             <div class="text-3xl mb-2">📭</div>
             <div class="text-xs font-bold text-slate-700">No saved profiles found</div>
-            <div class="text-[11px] text-slate-400 mt-1">Click "💾 Save to Database" on any verified number to store it here.</div>
+            <div class="text-[11px] text-slate-400 mt-1">Click "💾 Save to Database" on any verified number to store it in your Neon PostgreSQL database.</div>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = filtered.map(({ item, originalIndex }) => `
-        <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-sm hover:border-brand-300 transition-all">
+      container.innerHTML = filtered.map(({ item, originalIndex }) => {
+        const score = Number(item.fraud_score) || 0;
+        const scoreBadgeClass = score <= 30 
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+          : (score <= 70 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200');
+
+        return `
+        <div class="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs hover:border-brand-400 hover:shadow-sm transition-all">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span class="font-mono font-bold text-sm text-brand-600">${escapeHtml(item.phone_number)}</span>
-              <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">${escapeHtml(item.carrier || 'Real Mobile')}</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-mono font-black text-sm text-brand-600">${escapeHtml(item.phone_number)}</span>
+              <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">${escapeHtml(item.carrier || 'Real Mobile')}</span>
             </div>
-            <button onclick="deleteProfileFromDb('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs p-1 cursor-pointer" title="Delete">🗑️</button>
+            <button onclick="deleteProfileFromDb('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs p-1 cursor-pointer transition-colors" title="Delete from Database">🗑️</button>
           </div>
 
-          <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 mb-2">
-            <div><span class="text-slate-400">IP:</span> <span class="font-mono font-semibold">${escapeHtml(item.ip_address || '—')}</span></div>
-            <div><span class="text-slate-400">Fraud:</span> <span class="font-bold text-amber-600">${item.fraud_score ?? 0}/100</span></div>
-            <div><span class="text-slate-400">Location:</span> <span>${escapeHtml(item.location || 'USA')}</span></div>
-            <div><span class="text-slate-400">DOB:</span> <span>${escapeHtml(item.dob || '—')} (${item.age || '—'} yrs)</span></div>
+          <div class="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 mb-2.5 bg-slate-50/80 p-2 rounded-lg border border-slate-100">
+            <div><span class="text-slate-400 font-medium">IP:</span> <span class="font-mono font-bold text-slate-800">${escapeHtml(item.ip_address || '—')}</span></div>
+            <div><span class="text-slate-400 font-medium">Fraud:</span> <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded border ${scoreBadgeClass}">${score}/100</span></div>
+            <div><span class="text-slate-400 font-medium">Location:</span> <span class="text-slate-800 font-semibold">${escapeHtml(item.location || 'USA')}</span></div>
+            <div><span class="text-slate-400 font-medium">DOB:</span> <span class="text-slate-800 font-semibold">${escapeHtml(item.dob || '—')} (${item.age || '—'} yrs)</span></div>
           </div>
 
-          <div class="bg-slate-50 rounded-lg p-2.5 border border-slate-100 text-xs mb-3">
-            <div class="font-bold text-slate-800 mb-1">${escapeHtml(item.headline || '—')}</div>
+          <div class="bg-slate-50/60 rounded-lg p-2.5 border border-slate-100 text-xs mb-3">
+            <div class="font-bold text-slate-900 mb-1 flex items-center gap-1">
+              <span>💬</span> <span>${escapeHtml(item.headline || '—')}</span>
+            </div>
             <div class="text-slate-600 text-[11px] leading-relaxed line-clamp-3 whitespace-pre-line">${escapeHtml(item.post_bio || '—')}</div>
           </div>
 
-          <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
-            <span class="text-slate-400">${item.created_at ? new Date(item.created_at).toLocaleString() : 'Just now'}</span>
-            <div class="flex items-center gap-2.5">
-              <button onclick="copySavedNumber(${originalIndex})" class="text-brand-600 font-bold hover:underline cursor-pointer">Copy No.</button>
-              <button onclick="copySavedBio(${originalIndex})" class="text-brand-600 font-bold hover:underline cursor-pointer">Copy Bio</button>
-              <button onclick="copySavedAll(${originalIndex})" class="text-slate-700 font-bold hover:underline cursor-pointer">Copy All</button>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[10px]">
+            <span class="text-slate-400">🕒 ${item.created_at ? new Date(item.created_at).toLocaleString() : 'Just now'}</span>
+            <div class="flex items-center gap-2">
+              <button onclick="copySavedNumber(${originalIndex})" class="px-2 py-1 rounded bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold transition-colors cursor-pointer" title="Copy 10-digit number">Copy No.</button>
+              <button onclick="copySavedBio(${originalIndex})" class="px-2 py-1 rounded bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold transition-colors cursor-pointer" title="Copy Bio">Copy Bio</button>
+              <button onclick="copySavedAll(${originalIndex})" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer" title="Copy full persona summary">Copy All</button>
+              <button onclick="loadSavedProfileToDashboard(${originalIndex})" class="px-2 py-1 rounded bg-brand-600 hover:bg-brand-700 text-white font-bold transition-colors cursor-pointer" title="Load this into the main dashboard">🎯 Load</button>
             </div>
           </div>
         </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function deleteProfileFromDb(id) {
@@ -1153,13 +1237,47 @@ ${item.post_bio || '—'}
     // 8. Drawer & Modal Toggles
     function toggleSavedDrawer(open) {
       const drawer = document.getElementById('savedDrawer');
+      const backdrop = document.getElementById('savedDrawerBackdrop');
+      const panel = document.getElementById('savedDrawerPanel');
+      if (!drawer) return;
+
       if (open) {
-        drawer.classList.remove('opacity-0', 'pointer-events-none');
+        drawer.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
         loadSavedProfiles();
+        requestAnimationFrame(() => {
+          if (backdrop) {
+            backdrop.classList.remove('opacity-0');
+            backdrop.classList.add('opacity-100');
+          }
+          if (panel) {
+            panel.classList.remove('translate-x-full');
+            panel.classList.add('translate-x-0');
+          }
+        });
       } else {
-        drawer.classList.add('opacity-0', 'pointer-events-none');
+        if (backdrop) {
+          backdrop.classList.remove('opacity-100');
+          backdrop.classList.add('opacity-0');
+        }
+        if (panel) {
+          panel.classList.remove('translate-x-0');
+          panel.classList.add('translate-x-full');
+        }
+        document.body.classList.remove('overflow-hidden');
+        setTimeout(() => {
+          drawer.classList.add('hidden');
+        }, 300);
       }
     }
+
+    // Global Escape Key Listener to Close Drawer
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        toggleSavedDrawer(false);
+        toggleSettingsModal(false);
+      }
+    });
 
     function toggleSettingsModal(open) {
       const modal = document.getElementById('settingsModal');

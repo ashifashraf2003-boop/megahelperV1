@@ -1,11 +1,15 @@
 // Neon PostgreSQL Connection & Local Fallback Handler
+try { require('dotenv').config(); } catch (e) {}
 const { neon } = require('@neondatabase/serverless');
 const fs = require('fs');
 const path = require('path');
 
-// Read database URL from environment
+// Default Neon PostgreSQL connection string provided by user
+const NEON_DEFAULT_URL = 'postgresql://neondb_owner:npg_mXZcLPwn6Eb8@ep-red-frog-b774w9rg-pooler.c-13.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require';
+
+// Read database URL from environment with user's Neon connection fallback
 const getDbUrl = () => {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL || '';
+  return process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL || NEON_DEFAULT_URL;
 };
 
 // Local JSON storage fallback when DATABASE_URL is not yet configured
