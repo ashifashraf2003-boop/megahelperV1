@@ -1,5 +1,6 @@
 // Gemini 3.5 Flash Lite Persona Generation Endpoint
-const DEFAULT_KEY = process.env.AI_STUDIO_KEY || "";
+try { require('dotenv').config(); } catch (e) {}
+const DEFAULT_KEY = process.env.AI_STUDIO_KEY || "AIzaSyCLOg1HH8DpFuh2B4KkUGRCGab_oXq6z3E";
 
 const FALLBACK_TEMPLATES = [
   { headline: "🌙 Expect the unexpected... ✨", post: "Life is full of surprises, and tonight might be one of them. I’m looking for someone who isn't afraid to step out of their comfort zone. If you're spontaneous, fun, and ready for a fresh connection, send me a message and let's see where the night takes us. 🌌🔥" },

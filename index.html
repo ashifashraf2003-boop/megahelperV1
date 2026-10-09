@@ -49,33 +49,31 @@
       
       <!-- Brand Logo & Title -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-brand-600/20">
-          📱
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-amber-500 to-amber-400 p-0.5 shadow-md shadow-brand-600/25 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6 text-white drop-shadow-xs" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 6.5V12.5C3 17.5 6.8 21.8 12 23C17.2 21.8 21 17.5 21 12.5V6.5L12 2Z" fill="white" fill-opacity="0.22" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M13 6.5L8 14H12.5L11.5 20.5L17 13H12.5L13 6.5Z" fill="white" stroke="#EA580C" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none">USA Phone Validator & Proxy Automation</h1>
-            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-brand-50 text-brand-700 border border-brand-200">
-              Web & Neon DB
-            </span>
           </div>
           <p class="text-[11px] font-semibold text-slate-400 mt-0.5">Scamalytics Free IP Reputation & Real Mobile SIM Auto-Matcher</p>
         </div>
       </div>
 
-      <!-- Header Actions -->
+      <!-- Header Actions: Single Clean Slider Control Hub -->
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- View Saved Database Records Drawer Button -->
-        <button id="btnOpenDrawer" onclick="toggleSavedDrawer(true)" class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all shadow-xs cursor-pointer" title="View all saved records in Neon Database">
-          <span>📁</span>
-          <span>Saved Info (Database)</span>
-          <span id="savedCountBadge" class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-extrabold min-w-[20px] text-center">0</span>
-        </button>
-
-        <!-- Settings Modal Button -->
-        <button onclick="toggleSettingsModal(true)" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1.5" title="Settings & API Keys">
-          <span>⚙️</span>
-          <span class="hidden sm:inline">Settings</span>
+        <button 
+          id="btnOpenSliderHub" 
+          onclick="toggleSavedDrawer(true)" 
+          class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all shadow-md shadow-slate-900/15 cursor-pointer" 
+          title="Open Control Hub, Database & Settings Slider"
+        >
+          <span class="text-amber-400 text-sm">⚡</span>
+          <span class="font-extrabold">Control Hub</span>
+          <span id="savedCountBadge" class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-black min-w-[20px] text-center">0</span>
         </button>
       </div>
 
@@ -313,8 +311,12 @@
           </div>
 
           <!-- Headline Input -->
+          <!-- Headline Input with Dual Smart Copy -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Headline:</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-bold text-slate-700">Headline:</label>
+              <span class="text-[10px] text-slate-400 font-medium">Click Copy to copy both Headline & Bio</span>
+            </div>
             <div class="flex items-center gap-2">
               <input 
                 id="inputHeadline" 
@@ -322,7 +324,12 @@
                 value="☕ Coffee first, adventure after? 🚀" 
                 class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-brand-600 focus:bg-white transition-colors"
               />
-              <button onclick="copyHeadline()" class="px-3.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold flex items-center gap-1 shadow-xs transition-colors cursor-pointer">
+              <button 
+                id="btnCopyHeadlineAndBio"
+                onclick="copyHeadlineAndBioTogether()" 
+                class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer whitespace-nowrap"
+                title="Copies both Headline & Bio (also added separately to clipboard history)"
+              >
                 <span>📋</span> Copy
               </button>
             </div>
@@ -341,45 +348,15 @@
             >Always down for a spontaneous road trip or just finding the best local espresso spot. Looking for someone witty, kind, and ready for some genuine laughs. Let's skip the small talk and plan something fun. ✨ vibes 🥂</textarea>
           </div>
 
-          <!-- Bottom Action Toolbar (Including SAVE TO DATABASE) -->
-          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-100">
-            <div class="flex flex-wrap items-center gap-2">
-              <button onclick="actionAiGenerate()" id="btnAiGen" class="px-3.5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-extrabold shadow-sm shadow-brand-600/20 flex items-center gap-1.5 transition-colors cursor-pointer">
-                <span>✨</span> AI Generate Post
-              </button>
-              <button onclick="copyPostBio()" class="px-3 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer">
-                <span>📋</span> Copy Post
-              </button>
-              <button onclick="actionRandomPreset()" class="px-3 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer">
-                <span>🎲</span> Preset
-              </button>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <!-- Extra Button: Save to Neon Database -->
-              <button 
-                onclick="saveCurrentProfileToDb()" 
-                id="btnSaveToDb"
-                class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-extrabold shadow-sm shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
-                title="Save current verified profile, proxy, and bio to Neon Database"
-              >
-                <span>💾</span> Save to Database
-              </button>
-
-              <!-- View Saved Database Records Button -->
-              <button 
-                onclick="toggleSavedDrawer(true)" 
-                id="btnOpenDrawerBottom"
-                class="px-3.5 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 active:bg-brand-200 text-brand-700 border border-brand-200 text-xs font-extrabold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                title="View all saved profiles in Neon PostgreSQL Database"
-              >
-                <span>📁</span> Saved Info (<span id="savedCountBadgeBottom">0</span>)
-              </button>
-
-              <button onclick="copyAllPersonaData()" class="px-4 py-2.5 rounded-xl bg-brand-800 hover:bg-brand-900 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer">
-                <span>⭐</span> Copy All Data
-              </button>
-            </div>
+          <!-- Bottom Action: AI Generate Post Only -->
+          <div class="pt-2 border-t border-slate-100">
+            <button 
+              onclick="actionAiGenerate()" 
+              id="btnAiGen" 
+              class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-700 hover:to-amber-700 active:from-brand-800 active:to-amber-800 text-white text-xs sm:text-sm font-black shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <span>✨</span> AI Generate Post (Gemini 3.5 Flash Lite)
+            </button>
           </div>
 
         </div>
@@ -389,7 +366,7 @@
     </div>
   </main>
 
-  <!-- ================= SLIDE-OVER DRAWER: SAVED DATABASE PROFILES ================= -->
+  <!-- ================= SLIDE-OVER DRAWER: CONTROL HUB & SAVED PROFILES ================= -->
   <div id="savedDrawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
     <!-- Backdrop -->
     <div id="savedDrawerBackdrop" onclick="toggleSavedDrawer(false)" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 opacity-0 cursor-pointer"></div>
@@ -402,7 +379,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-1.5">
-                <span>📁</span> Saved Info (Database)
+                <span class="text-amber-500">⚡</span> Control Hub & Database
               </h3>
               <span id="drawerDbStatus" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -418,6 +395,57 @@
             <button onclick="toggleSavedDrawer(false)" class="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer text-sm font-bold" title="Close">
               ✕
             </button>
+          </div>
+        </div>
+
+        <!-- Hub Actions & Controls (Save to DB, Preset, System Status) -->
+        <div class="p-4 bg-slate-50/90 border-b border-slate-200 space-y-3">
+          <div class="flex items-center justify-between text-[11px] font-black text-slate-500 uppercase tracking-wider">
+            <span>⚡ Control Actions</span>
+            <span class="text-emerald-600 font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live Synced
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Save Current Profile to Database -->
+            <button 
+              onclick="saveCurrentProfileToDb()" 
+              id="btnSaveToDb"
+              class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-black shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              title="Save current verified profile, proxy, and bio to Neon Database"
+            >
+              <span>💾</span> Save Current to DB
+            </button>
+
+            <!-- Load Preset Persona -->
+            <button 
+              onclick="actionRandomPreset()" 
+              class="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              title="Load a random dating & social bio preset"
+            >
+              <span>🎲</span> Load Preset Bio
+            </button>
+          </div>
+
+          <!-- Backend System Engine Status -->
+          <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 text-[10px] space-y-1 text-slate-600">
+            <div class="flex items-center justify-between font-bold text-slate-800 mb-0.5">
+              <span>Backend Engines</span>
+              <span class="text-emerald-600 font-black">All Active 🟢</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">AI Engine:</span>
+              <span class="font-mono font-semibold text-brand-600">Gemini 3.5 Flash Lite</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Database:</span>
+              <span class="font-mono font-semibold text-emerald-600">Neon PostgreSQL (AWS us-east-1)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">IP Fraud Shield:</span>
+              <span class="font-mono font-semibold text-slate-700">Scamalytics Free Live API</span>
+            </div>
           </div>
         </div>
 
@@ -440,7 +468,6 @@
 
         <!-- Saved Profiles List Container -->
         <div id="savedProfilesList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll bg-slate-50/40">
-          <!-- Populated by JavaScript -->
           <div class="text-center py-12 text-slate-400 text-xs">Loading saved profiles from Neon DB...</div>
         </div>
 
@@ -454,45 +481,6 @@
           <button onclick="toggleSavedDrawer(false)" class="text-xs text-slate-500 hover:text-slate-800 font-bold cursor-pointer">Close ✕</button>
         </div>
 
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SETTINGS & API KEYS MODAL ================= -->
-  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-          <span>⚙️</span> API & Database Configuration
-        </h3>
-        <button onclick="toggleSettingsModal(false)" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-
-      <div class="space-y-4 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Veriphone API Key:</label>
-          <input id="cfgVeriphoneKey" type="text" value="0D1A2E6A82624C26B3190D3ED6B6AECD" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-mono text-xs focus:border-brand-600 focus:outline-none" />
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Google AI Studio (Gemini) Key:</label>
-          <input id="cfgAiKey" type="password" placeholder="Enter your Gemini API Key or leave empty for templates" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-mono text-xs focus:border-brand-600 focus:outline-none" />
-        </div>
-
-        <div class="pt-2 border-t border-slate-100">
-          <div class="flex items-center justify-between mb-1">
-            <label class="font-bold text-slate-700">Neon Database Connection URL:</label>
-            <a href="https://neon.tech" target="_blank" class="text-[10px] text-brand-600 hover:underline">Get Free Neon DB ↗</a>
-          </div>
-          <input id="cfgNeonDb" type="text" placeholder="postgresql://neondb_owner:...@ep-...neon.tech/neondb?sslmode=require" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 font-mono text-xs focus:border-brand-600 focus:outline-none" />
-          <p class="text-[10px] text-slate-400 mt-1">Configured on Vercel via <code class="text-brand-700 font-mono">DATABASE_URL</code> environment variable.</p>
-        </div>
-      </div>
-
-      <div class="mt-6 flex justify-end gap-2">
-        <button onclick="saveSettings(); toggleSettingsModal(false)" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-colors">
-          Save Settings & Close
-        </button>
       </div>
     </div>
   </div>
@@ -770,9 +758,9 @@
     }
 
     // ================= UNIVERSAL CLIPBOARD HELPER =================
-    async function copyToClipboard(text, successMsg = 'Copied to clipboard!', icon = '📋') {
+    async function copyToClipboard(text, successMsg = 'Copied to clipboard!', icon = '📋', silent = false) {
       if (!text && text !== 0 && text !== '0') {
-        showToast('Nothing to copy!', '⚠️');
+        if (!silent) showToast('Nothing to copy!', '⚠️');
         return false;
       }
       const str = String(text);
@@ -828,16 +816,16 @@
       }
 
       if (copied) {
-        showToast(successMsg, icon);
+        if (!silent && successMsg) showToast(successMsg, icon);
         return true;
       } else {
         // Last resort fallback: show prompt for user to copy directly
         try {
           window.prompt('Copy to clipboard (Ctrl+C or Cmd+C):', str);
-          showToast('Text selected! Press Ctrl+C', '📋');
+          if (!silent) showToast('Text selected! Press Ctrl+C', '📋');
           return true;
         } catch (e) {
-          showToast('Copy failed. Please copy manually.', '⚠️');
+          if (!silent) showToast('Copy failed. Please copy manually.', '⚠️');
           return false;
         }
       }
@@ -855,13 +843,47 @@
       copyToClipboard(num, `Copied ${num} (without +1)!`, '📋');
     }
 
-    function copyHeadline() {
-      const text = (document.getElementById('inputHeadline')?.value || '').trim();
-      if (!text) {
-        showToast('Headline is empty!', '⚠️');
+    // Smart Dual Copy: Copies both Headline & Bio together, and adds them separately to clipboard history
+    async function copyHeadlineAndBioTogether() {
+      const headline = (document.getElementById('inputHeadline')?.value || '').trim();
+      const bio = (document.getElementById('txtPostBio')?.value || '').trim();
+
+      if (!headline && !bio) {
+        showToast('Nothing to copy!', '⚠️');
         return;
       }
-      copyToClipboard(text, 'Copied Headline!', '📋');
+
+      const btn = document.getElementById('btnCopyHeadlineAndBio');
+      const origHtml = btn ? btn.innerHTML : '<span>📋</span> Copy';
+
+      // 1. Put Bio separately into clipboard history (silent)
+      if (bio) {
+        await copyToClipboard(bio, '', '', true);
+        await new Promise(r => setTimeout(r, 60));
+      }
+
+      // 2. Put Headline separately into clipboard history (silent)
+      if (headline) {
+        await copyToClipboard(headline, '', '', true);
+        await new Promise(r => setTimeout(r, 60));
+      }
+
+      // 3. Put combined text for direct paste (Headline on top, then Bio)
+      const combined = (headline && bio) ? `${headline}\n\n${bio}` : (headline || bio);
+      await copyToClipboard(combined, 'Copied Headline & Post/Bio! (Separate in history) 📋', '📋');
+
+      if (btn) {
+        btn.innerHTML = '<span>✅</span> Copied!';
+        btn.classList.add('bg-emerald-600');
+        setTimeout(() => {
+          btn.innerHTML = origHtml;
+          btn.classList.remove('bg-emerald-600');
+        }, 1800);
+      }
+    }
+
+    function copyHeadline() {
+      copyHeadlineAndBioTogether();
     }
 
     function copyPostBio() {
@@ -1275,19 +1297,8 @@ ${item.post_bio || '—'}
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         toggleSavedDrawer(false);
-        toggleSettingsModal(false);
       }
     });
-
-    function toggleSettingsModal(open) {
-      const modal = document.getElementById('settingsModal');
-      if (open) modal.classList.remove('hidden');
-      else modal.classList.add('hidden');
-    }
-
-    function saveSettings() {
-      showToast('Settings Saved!', '⚙️');
-    }
 
     // 9. Toast Notification Helper
     let toastTimer = null;
