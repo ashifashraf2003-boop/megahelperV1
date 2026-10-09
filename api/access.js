@@ -5,7 +5,7 @@ const SESSION_TTL_SECONDS = 60 * 60 * 8; // 8 hours (28,800 seconds)
 const DEFAULT_SESSION_SECRET = 'wh-GHmkBEE12heOpVyMOE0QaLDXQOH2B6ZE8kPUJ_sqc_7pzHVYF0PMqVStzdGH9';
 
 function allowedIps() {
-  return (process.env.ACCESS_ALLOWED_IPS || '103.156.189.77,103.156.189.79,103.156.189.*,127.0.0.1,::1')
+  return (process.env.ACCESS_ALLOWED_IPS || '103.156.189.77,103.156.189.78,103.156.189.79,103.156.189.*,127.0.0.1,::1')
     .split(',')
     .map((ip) => ip.trim())
     .filter(Boolean);
