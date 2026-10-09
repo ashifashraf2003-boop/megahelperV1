@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+.vercel/
+dist/
+build/
+*.exe
+*.spec
+__pycache__/
+*.pyc
+data/
+crash_log.txt

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+  
+  <!-- Smartphone Frame -->
+  <rect x="136" y="86" width="240" height="340" rx="36" fill="#090d16" stroke="#ffffff" stroke-opacity="0.25" stroke-width="8"/>
+  <rect x="156" y="126" width="200" height="240" rx="16" fill="#0f172a"/>
+  
+  <!-- Notch -->
+  <rect x="226" y="102" width="60" height="8" rx="4" fill="#334155"/>
+  
+  <!-- Check Shield -->
+  <circle cx="256" cy="246" r="60" fill="url(#shieldGrad)" />
+  <path d="M232 246 L248 262 L280 230" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

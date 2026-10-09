@@ -1,0 +1,17 @@
+{
+  "name": "USA Phone Validator",
+  "short_name": "PhoneCheck",
+  "description": "Check if a USA phone number is Real SIM or VoIP",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
